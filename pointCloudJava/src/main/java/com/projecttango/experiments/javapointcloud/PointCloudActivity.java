@@ -57,7 +57,9 @@ import org.apache.http.message.BasicNameValuePair;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -257,7 +259,7 @@ public class PointCloudActivity extends Activity implements OnClickListener {
                             new NotificationCompat.Builder(this)
                                     .setSmallIcon(R.drawable.ic_launcher)
                                     .setContentTitle("UTC Tango Point Cloud")
-                                    .setContentText("Collecting Data!")
+                                    .setContentText("Collecting Data! " + getCurrentTimeStamp())
                                     .setOngoing(true)
                                     .setPriority(2)
                                   //  .setAutoCancel(true)
@@ -360,53 +362,54 @@ public class PointCloudActivity extends Activity implements OnClickListener {
                     }
 
 
-                    if(isOn) {
+                    if (isOn) {
 
 
-                    translationString = mPose.translation[0] + ", "
-                            + mPose.translation[1] + ", "
-                            + mPose.translation[2];
-                    quaternionString =
-                            +mPose.rotation[0] + ", "
-                                    + mPose.rotation[1] + ", "
-                                    + mPose.rotation[2] + ", "
-                                    + mPose.rotation[3];
-
-                    try {
-                        //timestamp = pose.timestamp; //get timestamp data
-
-                        //Initializes HTTP POST request
-                        HttpClient httpclient = new DefaultHttpClient();
-                        HttpPost httpPost = new HttpPost("http://10.101.102.123/datapoint");
-                        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
-                        nameValuePair.add(new BasicNameValuePair("uuid", uuid + ""));
-                        nameValuePair.add(new BasicNameValuePair("pose_timestamp", pose.timestamp + ""));
-                        nameValuePair.add(new BasicNameValuePair("translation", translationString));
-                        nameValuePair.add(new BasicNameValuePair("rotation", quaternionString));
-
-
-                        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+                        translationString = mPose.translation[0] + ", "
+                                + mPose.translation[1] + ", "
+                                + mPose.translation[2];
+                        quaternionString =
+                                +mPose.rotation[0] + ", "
+                                        + mPose.rotation[1] + ", "
+                                        + mPose.rotation[2] + ", "
+                                        + mPose.rotation[3];
 
                         try {
-                            //Send Request
-                            HttpResponse response = httpclient.execute(httpPost);
-                            // write response to log
-                            Log.d("Http Post Response:", response.toString());
-                        } catch (ClientProtocolException e) { // Catch a few different Exceptions
-                            // Log exception
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            // Log exception
-                            e.printStackTrace();
-                            Log.i(TAG, e.getMessage());
+                            //timestamp = pose.timestamp; //get timestamp data
+
+                            //Initializes HTTP POST request
+                            HttpClient httpclient = new DefaultHttpClient();
+                            HttpPost httpPost = new HttpPost("http://10.101.102.123/datapoint");
+                            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
+                            nameValuePair.add(new BasicNameValuePair("uuid", uuid + ""));
+                            nameValuePair.add(new BasicNameValuePair("pose_timestamp", pose.timestamp + ""));
+                            nameValuePair.add(new BasicNameValuePair("translation", translationString));
+                            nameValuePair.add(new BasicNameValuePair("rotation", quaternionString));
+
+
+                            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+
+                            try {
+                                //Send Request
+                                HttpResponse response = httpclient.execute(httpPost);
+                                // write response to log
+                                Log.d("Http Post Response:", response.toString());
+                            } catch (ClientProtocolException e) { // Catch a few different Exceptions
+                                // Log exception
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                // Log exception
+                                e.printStackTrace();
+                                Log.i(TAG, e.getMessage());
+                            }
+
+                            // HttpResponse response = httpclient.execute(new HttpGet("http://localhost:1234/send-data"));
+                        } catch (Exception exception) {
+                            Log.i(TAG, exception.getMessage());
                         }
 
-                        // HttpResponse response = httpclient.execute(new HttpGet("http://localhost:1234/send-data"));
-                    } catch (Exception exception) {
-                        Log.i(TAG, exception.getMessage());
+                    } else {
                     }
-
-                    } else{   }
                 }
 
                 @Override
@@ -524,5 +527,18 @@ public class PointCloudActivity extends Activity implements OnClickListener {
                 }
             }
         }).start();
+    }
+    public static String getCurrentTimeStamp(){
+        try {
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTimeStamp = dateFormat.format(new Date()); // Find todays date
+
+            return currentTimeStamp;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        }
     }
 }
