@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="D:\Documents\Android\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="23.0.0 rc2"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67">
+        <dex dex="C:\Users\Jaysp656\AndroidStudioProjects\PointCloudJava\pointCloudJava\build\intermediates\pre-dexed\debug\support-v4-19.1.0-0394818b00026eea0e189c26fb725642053a1d68.jar" />
+    </item>
+    <item
+        jar="C:\Users\Jaysp656\AndroidStudioProjects\PointCloudJava\pointCloudJava\libs\tango_java_lib.jar"
+        jumboMode="false"
+        revision="23.0.0 rc2"
+        sha1="cee1f04897214dbfe7850cd64a59452c42ed3c08">
+        <dex dex="C:\Users\Jaysp656\AndroidStudioProjects\PointCloudJava\pointCloudJava\build\intermediates\pre-dexed\debug\tango_java_lib-8e27e54bf1ec3d6d670f0627bfb0306cd94fb01b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Jaysp656\AndroidStudioProjects\PointCloudJava\pointCloudJava\build\intermediates\exploded-aar\PointCloudJava\tangoUtils\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0 rc2"
+        sha1="221f4fcb6a772774a7a96dad0663a9014c1c6bd2">
+        <dex dex="C:\Users\Jaysp656\AndroidStudioProjects\PointCloudJava\pointCloudJava\build\intermediates\pre-dexed\debug\classes-6ea9801b28d193a1653ab4bfa2c0afce2cbbfb9e.jar" />
+    </item>
+
+</items>
