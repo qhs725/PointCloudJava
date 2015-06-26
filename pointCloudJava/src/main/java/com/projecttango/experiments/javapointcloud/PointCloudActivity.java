@@ -115,6 +115,7 @@ public class PointCloudActivity extends Activity implements OnClickListener {
     private String quaternionString;
     private Boolean isOn = false;
     private UUID uuid;
+    private long nanoTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,11 +173,17 @@ public class PointCloudActivity extends Activity implements OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            mTango.disconnect();
-            mIsTangoServiceConnected = false;
-        } catch (TangoErrorException e) {
-            Toast.makeText(getApplicationContext(), R.string.TangoError, Toast.LENGTH_SHORT).show();
+
+        if(isOn) {
+            mIsTangoServiceConnected = true;
+        }
+        else {
+            try {
+                mTango.disconnect();
+                mIsTangoServiceConnected = false;
+            } catch (TangoErrorException e) {
+                Toast.makeText(getApplicationContext(), R.string.TangoError, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -363,7 +370,7 @@ public class PointCloudActivity extends Activity implements OnClickListener {
 
 
                     if (isOn) {
-
+                        nanoTime = System.nanoTime();
 
                         translationString = mPose.translation[0] + ", "
                                 + mPose.translation[1] + ", "
@@ -382,7 +389,12 @@ public class PointCloudActivity extends Activity implements OnClickListener {
                             HttpPost httpPost = new HttpPost("http://10.101.102.123/datapoint");
                             List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
                             nameValuePair.add(new BasicNameValuePair("uuid", uuid + ""));
+                            nameValuePair.add(new BasicNameValuePair("timestamp",  getCurrentTimeStamp()));
+
+
+                            nameValuePair.add(new BasicNameValuePair("nanoTime", nanoTime + ""));
                             nameValuePair.add(new BasicNameValuePair("pose_timestamp", pose.timestamp + ""));
+
                             nameValuePair.add(new BasicNameValuePair("translation", translationString));
                             nameValuePair.add(new BasicNameValuePair("rotation", quaternionString));
 
@@ -528,6 +540,8 @@ public class PointCloudActivity extends Activity implements OnClickListener {
             }
         }).start();
     }
+
+    //Method to get System timestamp
     public static String getCurrentTimeStamp(){
         try {
 
