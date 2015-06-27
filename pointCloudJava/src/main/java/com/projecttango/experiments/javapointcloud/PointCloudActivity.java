@@ -56,6 +56,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -116,6 +117,9 @@ public class PointCloudActivity extends Activity implements OnClickListener {
     private Boolean isOn = false;
     private UUID uuid;
     private long nanoTime;
+    private double poseTimestamp;
+    private FloatBuffer mxyz;
+    private float[] s;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -368,60 +372,8 @@ public class PointCloudActivity extends Activity implements OnClickListener {
                         mRenderer.updateViewMatrix();
                     }
 
+                    poseTimestamp = pose.timestamp;
 
-                    if (isOn) {
-                        nanoTime = System.nanoTime();
-
-                        translationString = mPose.translation[0] + ", "
-                                + mPose.translation[1] + ", "
-                                + mPose.translation[2];
-                        quaternionString =
-                                +mPose.rotation[0] + ", "
-                                        + mPose.rotation[1] + ", "
-                                        + mPose.rotation[2] + ", "
-                                        + mPose.rotation[3];
-
-                        try {
-                            //timestamp = pose.timestamp; //get timestamp data
-
-                            //Initializes HTTP POST request
-                            HttpClient httpclient = new DefaultHttpClient();
-                            HttpPost httpPost = new HttpPost("http://10.101.102.123/datapoint");
-                            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
-                            nameValuePair.add(new BasicNameValuePair("uuid", uuid + ""));
-                            nameValuePair.add(new BasicNameValuePair("timestamp",  getCurrentTimeStamp()));
-
-
-                            nameValuePair.add(new BasicNameValuePair("nanoTime", nanoTime + ""));
-                            nameValuePair.add(new BasicNameValuePair("pose_timestamp", pose.timestamp + ""));
-
-                            nameValuePair.add(new BasicNameValuePair("translation", translationString));
-                            nameValuePair.add(new BasicNameValuePair("rotation", quaternionString));
-
-
-                            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-
-                            try {
-                                //Send Request
-                                HttpResponse response = httpclient.execute(httpPost);
-                                // write response to log
-                                Log.d("Http Post Response:", response.toString());
-                            } catch (ClientProtocolException e) { // Catch a few different Exceptions
-                                // Log exception
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                // Log exception
-                                e.printStackTrace();
-                                Log.i(TAG, e.getMessage());
-                            }
-
-                            // HttpResponse response = httpclient.execute(new HttpGet("http://localhost:1234/send-data"));
-                        } catch (Exception exception) {
-                            Log.i(TAG, exception.getMessage());
-                        }
-
-                    } else {
-                    }
                 }
 
                 @Override
@@ -454,6 +406,70 @@ public class PointCloudActivity extends Activity implements OnClickListener {
                             Toast.makeText(getApplicationContext(), R.string.TangoError,
                                     Toast.LENGTH_SHORT).show();
                         }
+                    }
+
+                    if (isOn) {
+
+                       //  s = new float[xyzIj.ijRows + xyzIj.ijCols];
+                       mxyz = xyzIj.xyz.asReadOnlyBuffer();
+
+
+                        nanoTime = System.nanoTime();
+
+                        translationString = mPose.translation[0] + ", "
+                                + mPose.translation[1] + ", "
+                                + mPose.translation[2];
+                        quaternionString =
+                                +mPose.rotation[0] + ", "
+                                        + mPose.rotation[1] + ", "
+                                        + mPose.rotation[2] + ", "
+                                        + mPose.rotation[3];
+
+                        try {
+                            //timestamp = pose.timestamp; //get timestamp data
+
+                            //Initializes HTTP POST request
+                            HttpClient httpclient = new DefaultHttpClient();
+                            HttpPost httpPost = new HttpPost("http://10.101.102.123/datapoint");
+                            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
+                            nameValuePair.add(new BasicNameValuePair("uuid", uuid + ""));
+                            nameValuePair.add(new BasicNameValuePair("timestamp",   getCurrentTimeStamp()));
+
+
+                            nameValuePair.add(new BasicNameValuePair("nanoTime", nanoTime + ""));
+                            nameValuePair.add(new BasicNameValuePair("pose_timestamp", poseTimestamp + ""));
+
+                            nameValuePair.add(new BasicNameValuePair("translation", translationString));
+                            nameValuePair.add(new BasicNameValuePair("rotation", quaternionString));
+
+                            for(int i = 0; i < 10; i++) {
+                                nameValuePair.add(new BasicNameValuePair("xyz["+i+"]", " | x | " + mxyz.get() + " | y | " + mxyz.get() + " | z | " + mxyz.get()));
+                            }
+
+
+
+                            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+
+                            try {
+                                //Send Request
+                                HttpResponse response = httpclient.execute(httpPost);
+                                // write response to log
+                                Log.d("Http Post Response:", response.toString());
+                            } catch (ClientProtocolException e) { // Catch a few different Exceptions
+                                // Log exception
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                // Log exception
+                                e.printStackTrace();
+                                Log.i(TAG, e.getMessage());
+                            }
+
+                            // HttpResponse response = httpclient.execute(new HttpGet("http://localhost:1234/send-data"));
+                        } catch (Exception exception) {
+                            Log.i(TAG, exception.getMessage());
+                        }
+
+                    } else {
                     }
 
                 }
